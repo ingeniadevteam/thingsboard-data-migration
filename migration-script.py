@@ -116,7 +116,7 @@ for asset in sourceAssets:
     targetAsset = next((x for x in targetAssets if x['name'] == assetName), None)
     targetAssetId = targetAsset['id']['id']
     targetAssetName = targetAsset['name']
-    print(assetId, assetName, '=>', targetAssetId, targetAssetName)
+    print("\n =>", assetId, assetName, '=>', targetAssetId, targetAssetName)
     keys = timeseriesKeys(SOURCE_TB_ADDRESS,SOURCE_TB_PORT,SOURCE_AUTH_TOKEN,assetId,'ASSET')
     for key in keys:
         if keyFilter("ASSET", KEY_FILTER, key):
@@ -158,7 +158,7 @@ for device in sourceDevices:
     targetDevice = next((x for x in targetDevices if x['name'] == deviceName), None)
     targetDeviceId = targetDevice['id']['id']
     targetDeviceName = targetDevice['name']
-    print(deviceId, deviceName, '=>', targetDeviceId, targetDeviceName)
+    print("\n =>", deviceId, deviceName, '=>', targetDeviceId, targetDeviceName)
     keys = timeseriesKeys(SOURCE_TB_ADDRESS,SOURCE_TB_PORT,SOURCE_AUTH_TOKEN,deviceId,'DEVICE')
     for key in keys:
         if keyFilter("DEVICE", KEY_FILTER, key):
@@ -197,6 +197,6 @@ for device in sourceDevices:
 
 
 logging.info('Execution finished.')
-print('Execution finished.')
+print('\nExecution finished.')
 
 
