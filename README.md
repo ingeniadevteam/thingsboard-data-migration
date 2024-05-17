@@ -1,6 +1,6 @@
 # thingsboard-data-migration
 
-This tool performs data migration between two different instances of ThingsBoard.
+Performs data migration between two different instances of ThingsBoard.
 <br>
 The tool exploits the native ThingsBoard <i>HTTP APIs</i> to retrive and send data.
 

@@ -62,7 +62,9 @@ print("end  :", endDate)
 
 if POST_DATA:
     print("*** You are about to send data to the server, please think twice! ***")
-    time.sleep(3)
+    time.sleep(2)
+    print("*** Ok, let's go! ***")
+    time.sleep(0.5)
 else:
     time.sleep(0.5)
 
@@ -150,48 +152,48 @@ for asset in sourceAssets:
         break
     break
 
-# for device in sourceDevices:
-#     deviceId = device['id']['id']
-#     deviceName = device['name']
-#     targetDevice = next((x for x in targetDevices if x['name'] == deviceName), None)
-#     targetDeviceId = targetDevice['id']['id']
-#     targetDeviceName = targetDevice['name']
-#     print(deviceId, deviceName, '=>', targetDeviceId, targetDeviceName)
-#     keys = timeseriesKeys(SOURCE_TB_ADDRESS,SOURCE_TB_PORT,SOURCE_AUTH_TOKEN,deviceId,'DEVICE')
-#     for key in keys:
-#         if keyFilter("DEVICE", KEY_FILTER, key):
-#             current = startDate
-#             while current < endDate:
-#                 startTs = int(current.timestamp()) * 1000
-#                 endTs = int(current.timestamp() + AN_HOUR) * 1000
-#                 sourceData = getData(SOURCE_TB_ADDRESS,SOURCE_TB_PORT,SOURCE_AUTH_TOKEN,deviceId,key,startTs,endTs,'DEVICE')
-#                 targetData = {}
-#                 if CHECK_TARGET_DATA:
-#                     targetData = getData(TARGET_TB_ADDRESS,TARGET_TB_PORT,TARGET_AUTH_TOKEN,targetDeviceId,key,startTs,endTs,'DEVICE')
+for device in sourceDevices:
+    deviceId = device['id']['id']
+    deviceName = device['name']
+    targetDevice = next((x for x in targetDevices if x['name'] == deviceName), None)
+    targetDeviceId = targetDevice['id']['id']
+    targetDeviceName = targetDevice['name']
+    print(deviceId, deviceName, '=>', targetDeviceId, targetDeviceName)
+    keys = timeseriesKeys(SOURCE_TB_ADDRESS,SOURCE_TB_PORT,SOURCE_AUTH_TOKEN,deviceId,'DEVICE')
+    for key in keys:
+        if keyFilter("DEVICE", KEY_FILTER, key):
+            current = startDate
+            while current < endDate:
+                startTs = int(current.timestamp()) * 1000
+                endTs = int(current.timestamp() + AN_HOUR) * 1000
+                sourceData = getData(SOURCE_TB_ADDRESS,SOURCE_TB_PORT,SOURCE_AUTH_TOKEN,deviceId,key,startTs,endTs,'DEVICE')
+                targetData = {}
+                if CHECK_TARGET_DATA:
+                    targetData = getData(TARGET_TB_ADDRESS,TARGET_TB_PORT,TARGET_AUTH_TOKEN,targetDeviceId,key,startTs,endTs,'DEVICE')
 
-#                 if isinstance(targetData, dict) and key in targetData:
-#                     print('Error: data already exists in target', current, deviceName, key, len(targetData[key]))
-#                 else:
-#                     print(current, deviceName, key, len(sourceData[key]))
-#                     if VERBOSE:
-#                         print(sourceData[key])
-#                     if POST_DATA:
-#                         formattedData = postDataFormat(sourceData, key)
-#                         print("postData Devices")
-#                         if formattedData is not None:
-#                             postData(TARGET_TB_ADDRESS,TARGET_TB_PORT,TARGET_AUTH_TOKEN,targetDeviceId,'DEVICE',formattedData)
+                if isinstance(targetData, dict) and key in targetData:
+                    print('Error: data already exists in target', current, deviceName, key, len(targetData[key]))
+                else:
+                    print(current, deviceName, key, len(sourceData[key]))
+                    if VERBOSE:
+                        print(sourceData[key])
+                    if POST_DATA:
+                        formattedData = postDataFormat(sourceData, key)
+                        print("postData Devices")
+                        if formattedData is not None:
+                            postData(TARGET_TB_ADDRESS,TARGET_TB_PORT,TARGET_AUTH_TOKEN,targetDeviceId,'DEVICE',formattedData)
 
-#                 time.sleep(0.25)
-#                 if current == endDate:
-#                     break
-#                 current = current + timedelta(seconds=(AN_HOUR + 1))
-#                 if current >= endDate:
-#                     current = endDate
-#         else:
-#             continue
+                time.sleep(0.25)
+                if current == endDate:
+                    break
+                current = current + timedelta(seconds=(AN_HOUR + 1))
+                if current >= endDate:
+                    current = endDate
+        else:
+            continue
 
-#         break
-#     break
+        break
+    break
 
 
 logging.info('Execution finished.')
