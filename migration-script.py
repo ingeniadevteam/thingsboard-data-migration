@@ -148,9 +148,8 @@ for asset in sourceAssets:
                     current = endDate
         else:
             continue
-
-        break
-    break
+    #     break
+    # break
 
 for device in sourceDevices:
     deviceId = device['id']['id']
@@ -191,9 +190,8 @@ for device in sourceDevices:
                     current = endDate
         else:
             continue
-
-        break
-    break
+    #     break
+    # break
 
 
 logging.info('Execution finished.')
