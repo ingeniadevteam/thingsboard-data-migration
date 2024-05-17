@@ -1,0 +1,27 @@
+# This is the configuration file of the data migrartion script
+
+# Source ThingsBoard instance
+source:
+    host: 
+    port: 
+    user: 
+    password: 
+
+# Target ThingsBoard instance (MQTT)
+target:
+    host: 
+    port: 
+
+target_http:
+    host: 
+    port: 
+    user: 
+    password: 
+
+# Specify path and name of the log file   
+log:
+    file: ./migrationLog.log
+    
+# Specify path and name of the local database text file (used only in "fetch" and "send" modes) --> AVOID EXTENSIONS!
+db:
+    file: ./migrationDb

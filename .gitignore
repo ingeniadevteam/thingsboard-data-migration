@@ -1,0 +1,6 @@
+*.yml
+*.db
+*.log
+__pycache__
+*.py[cod]
+data
