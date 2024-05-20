@@ -11,9 +11,13 @@ def auth(ip,port,user,password):
     # Define the body of the authorization request
     data = '{"username":"'+user+'", "password":"'+password+'"}'
 
+    protocol = "https"
+    if str(ip) == 'localhost':
+        protocol = 'http'
+
     # Perform the POST request to obtain X-Token Authorization
     try:
-        response = requests.post('https://'+str(ip)+':'+str(port)+'/api/auth/login', headers=headersToken, data=data)
+        response = requests.post(protocol+'://'+str(ip)+':'+str(port)+'/api/auth/login', headers=headersToken, data=data)
         X_AUTH_TOKEN = response.json()['token']
     except Exception as e:
         print("\nAn exception occurred while trying to obtain the authorization from SOURCE Thigsboard: ", e)

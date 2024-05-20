@@ -29,6 +29,8 @@ parser.add_argument("-i", action="store", dest="initialTs", type=str, default=""
                     help="Specify initial UNIX timestamp", required=True)
 parser.add_argument("-e", action="store", dest="endTs", type=str, default="",
                     help="Specify final (ending) UNIX timestamp", required=True)
+parser.add_argument("-m", action="store", dest="timewindow", type=str, default="",
+                    help="Specify timewindow in seconds", required=True)
 parser.add_argument("-f", action="store", dest="filter", type=str, default="None",
                     help="Specify the key filter", required=False)
 parser.add_argument("-x", action="store_true", dest="checkTargetData", default=False,
@@ -49,16 +51,15 @@ ENDTS = int(args.endTs)
 CHECK_TARGET_DATA = args.checkTargetData
 POST_DATA = args.postData
 VERBOSE = args.verbose
+TIMEWINDOW = int(args.timewindow)
 
-
-
-AN_HOUR = 60 * 60
 startDate = datetime.fromtimestamp(STARTTS)
 endDate = datetime.fromtimestamp(ENDTS)
 diff = ENDTS - STARTTS
 
-print("start:", startDate)
-print("end  :", endDate)
+print(" start:", startDate)
+print("   end:", endDate)
+print("window:", str(timedelta(seconds = TIMEWINDOW)))
 
 if POST_DATA:
     print("*** You are about to send data to the server, please think twice! ***")
@@ -123,33 +124,38 @@ for asset in sourceAssets:
             current = startDate
             while current < endDate:
                 startTs = int(current.timestamp()) * 1000
-                endTs = int(current.timestamp() + AN_HOUR) * 1000
+                endTs = int(current.timestamp() + TIMEWINDOW) * 1000
                 sourceData = getData(SOURCE_TB_ADDRESS,SOURCE_TB_PORT,SOURCE_AUTH_TOKEN,assetId,key,startTs,endTs,'ASSET')
-                targetData = {}
+                targetData = dict()
                 if CHECK_TARGET_DATA:
                     targetData = getData(TARGET_TB_ADDRESS,TARGET_TB_PORT,TARGET_AUTH_TOKEN,targetAssetId,key,startTs,endTs,'ASSET')
 
                 if isinstance(targetData, dict) and key in targetData:
                     print('Error: data already exists in target', current, assetName, key, len(targetData[key]))
                 else:
-                    print(current, assetName, key, len(sourceData[key]))
-                    if VERBOSE:
-                        print(sourceData[key])
-                    if POST_DATA:
-                        formattedData = postDataFormat(sourceData, key)
-                        if formattedData is not None:
-                            postData(TARGET_TB_ADDRESS,TARGET_TB_PORT,TARGET_AUTH_TOKEN,targetAssetId,'ASSET',formattedData)
-
-                time.sleep(0.25)
+                    if isinstance(sourceData, dict) and key in sourceData:
+                        print(current, assetName, key, len(sourceData[key]))
+                        logging.info(current.strftime("%m/%d/%Y, %H:%M:%S") + " " + str(startTs) + " " + str(endTs) + " " + assetName + " " + key + " " + str(len(sourceData[key])))
+                        if VERBOSE:
+                            print(sourceData[key])
+                        if POST_DATA:
+                            formattedData = postDataFormat(sourceData, key)
+                            if formattedData is not None:
+                                postData(TARGET_TB_ADDRESS,TARGET_TB_PORT,TARGET_AUTH_TOKEN,targetAssetId,'ASSET',formattedData)
+                                time.sleep(0.1)
+                    else:
+                        print(current, assetName, key)
+                
+                time.sleep(0.1)
                 if current == endDate:
                     break
-                current = current + timedelta(seconds=(AN_HOUR + 1))
+                current = current + timedelta(seconds=(TIMEWINDOW + 1))
                 if current >= endDate:
                     current = endDate
         else:
             continue
-    #     break
-    # break
+        break
+    break
 
 for device in sourceDevices:
     deviceId = device['id']['id']
@@ -164,34 +170,38 @@ for device in sourceDevices:
             current = startDate
             while current < endDate:
                 startTs = int(current.timestamp()) * 1000
-                endTs = int(current.timestamp() + AN_HOUR) * 1000
+                endTs = int(current.timestamp() + TIMEWINDOW) * 1000
                 sourceData = getData(SOURCE_TB_ADDRESS,SOURCE_TB_PORT,SOURCE_AUTH_TOKEN,deviceId,key,startTs,endTs,'DEVICE')
-                targetData = {}
+                targetData = dict()
                 if CHECK_TARGET_DATA:
                     targetData = getData(TARGET_TB_ADDRESS,TARGET_TB_PORT,TARGET_AUTH_TOKEN,targetDeviceId,key,startTs,endTs,'DEVICE')
 
                 if isinstance(targetData, dict) and key in targetData:
                     print('Error: data already exists in target', current, deviceName, key, len(targetData[key]))
                 else:
-                    print(current, deviceName, key, len(sourceData[key]))
-                    if VERBOSE:
-                        print(sourceData[key])
-                    if POST_DATA:
-                        formattedData = postDataFormat(sourceData, key)
-                        print("postData Devices")
-                        if formattedData is not None:
-                            postData(TARGET_TB_ADDRESS,TARGET_TB_PORT,TARGET_AUTH_TOKEN,targetDeviceId,'DEVICE',formattedData)
+                    if isinstance(sourceData, dict) and key in sourceData:
+                        print(current, startTs, deviceName, key, len(sourceData[key]))
+                        logging.info(current.strftime("%m/%d/%Y, %H:%M:%S") + " " + str(startTs) + " " + str(endTs) + " " + deviceName + " " + key + " " + str(len(sourceData[key])))
+                        if VERBOSE:
+                            print(sourceData[key])
+                        if POST_DATA:
+                            formattedData = postDataFormat(sourceData, key)
+                            if formattedData is not None:
+                                postData(TARGET_TB_ADDRESS,TARGET_TB_PORT,TARGET_AUTH_TOKEN,targetDeviceId,'DEVICE',formattedData)
+                                time.sleep(0.1)
+                    else:
+                        print(current, deviceName, key)
 
-                time.sleep(0.25)
+                time.sleep(0.1)
                 if current == endDate:
                     break
-                current = current + timedelta(seconds=(AN_HOUR + 1))
+                current = current + timedelta(seconds=(TIMEWINDOW + 1))
                 if current >= endDate:
                     current = endDate
         else:
             continue
-    #     break
-    # break
+        break
+    break
 
 
 logging.info('Execution finished.')

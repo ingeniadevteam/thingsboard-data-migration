@@ -30,9 +30,13 @@ def getData(ip,port,X_AUTH_TOKEN,deviceId,key,startTs,endTs,type="DEVICE"):
     # Define the headers of the request
     headers = {'Accept':'application/json','X-Authorization': 'Bearer '+X_AUTH_TOKEN}
 
+    protocol = "https"
+    if str(ip) == 'localhost':
+        protocol = 'http'
+
     # Perform the GET request to obtain timeseries
     try:
-        r = requests.get("https://"+str(ip)+":"+str(port)+"/api/plugins/telemetry/"+type+"/"+deviceId+"/values/timeseries?interval="+INTERVAL+"&limit="+LIMIT+"&agg="+AGG+"&keys="+key+"&startTs="+str(startTs)+"&endTs="+str(endTs),headers=headers)
+        r = requests.get(protocol+"://"+str(ip)+":"+str(port)+"/api/plugins/telemetry/"+type+"/"+deviceId+"/values/timeseries?interval="+INTERVAL+"&limit="+LIMIT+"&agg="+AGG+"&keys="+key+"&startTs="+str(startTs)+"&endTs="+str(endTs),headers=headers)
         #print("Request to SOURCE ThingsBoard - response code: ", r.status_code)
     except Exception as e:
         print("\nAn exception occurred while trying to obtain and print the timeseries from SOURCE Thigsboard: ", e)
@@ -42,7 +46,7 @@ def getData(ip,port,X_AUTH_TOKEN,deviceId,key,startTs,endTs,type="DEVICE"):
     TIMESERIES = r.json()
     #print("Fetched timseries: ", TIMESERIES)
     
-    logging.info('Timeseries request to device '+deviceId+' with key '+key+' was successful.')
+    # logging.info('Timeseries request to device '+deviceId+' with key '+key+' was successful.')
 	
     # Return the result of the GET request
     return TIMESERIES
@@ -62,10 +66,14 @@ def getData(ip,port,X_AUTH_TOKEN,deviceId,key,startTs,endTs,type="DEVICE"):
 def postData(ip,port,X_AUTH_TOKEN,deviceId,type="DEVICE",data="[]"):
     # Define the headers of the request
     headers = {'Content-Type': 'application/json','Accept':'application/json','X-Authorization': 'Bearer '+X_AUTH_TOKEN}
+    
+    protocol = "https"
+    if str(ip) == 'localhost':
+        protocol = 'http'
 
     # Perform the POST request to send timeseries
     try:
-        r = requests.post("https://"+str(ip)+":"+str(port)+"/api/plugins/telemetry/"+type+"/"+deviceId+"/timeseries/ANY",headers=headers,data=data)
+        r = requests.post(protocol+"://"+str(ip)+":"+str(port)+"/api/plugins/telemetry/"+type+"/"+deviceId+"/timeseries/ANY",headers=headers,data=data)
     except Exception as e:
         print("\nAn exception occurred while trying to send the timeseries to TARGET Thigsboard: ", e)
         logging.error('Timeseries POST request to device '+deviceId+' failed.')

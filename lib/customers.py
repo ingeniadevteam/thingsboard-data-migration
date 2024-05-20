@@ -15,9 +15,13 @@ def getCustomers(ip, port, X_AUTH_TOKEN):
     # Define the headers of the authorization request
     headers = {'Accept':'application/json','X-Authorization': 'Bearer '+X_AUTH_TOKEN}
 
+    protocol = "https"
+    if str(ip) == 'localhost':
+        protocol = 'http'
+
     # Perform the GET request
     try:
-        request = requests.get("https://"+str(ip)+":"+str(port)+"/api/customers?pageSize=50&page=0",headers=headers)
+        request = requests.get(protocol+"://"+str(ip)+":"+str(port)+"/api/customers?pageSize=50&page=0",headers=headers)
         return request.json()['data']
     except Exception as e:
         print("\nAn exception occurred while trying to obtain the customer: ", e)
@@ -27,10 +31,14 @@ def getCustomers(ip, port, X_AUTH_TOKEN):
 def getCustomerAssets(ip, port, X_AUTH_TOKEN, customerId):
     # Define the headers of the authorization request
     headers = {'Accept':'application/json','X-Authorization': 'Bearer '+X_AUTH_TOKEN}
+    
+    protocol = "https"
+    if str(ip) == 'localhost':
+        protocol = 'http'
 
     # Perform the GET request
     try:
-        request = requests.get("https://"+str(ip)+":"+str(port)+"/api/customer/"+customerId+"/assets?pageSize=50&page=0",headers=headers)
+        request = requests.get(protocol+"://"+str(ip)+":"+str(port)+"/api/customer/"+customerId+"/assets?pageSize=50&page=0",headers=headers)
         return request.json()['data']
     except Exception as e:
         print("\nAn exception occurred while trying to obtain the customer: ", e)
